@@ -1,0 +1,25 @@
+{
+  "name": "@meri-imperiumi/signalk-aws-iot",
+  "version": "1.0.0",
+  "description": "Plugin that sends metrics to AWS IoT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/meri-imperiumi/signalk-aws-iot.git"
+  },
+  "keywords": [
+    "signalk-node-server-plugin"
+  ],
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meri-imperiumi/signalk-aws-iot/issues"
+  },
+  "homepage": "https://github.com/meri-imperiumi/signalk-aws-iot#readme",
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.1"
+  }
+}
