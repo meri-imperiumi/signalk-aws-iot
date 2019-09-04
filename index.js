@@ -1,7 +1,7 @@
 const awsIot = require('aws-iot-device-sdk');
 
-module.exports = function (app) {
-  let plugin = {};
+module.exports = (app) => {
+  const plugin = {};
   let device;
   let unsubscribes = [];
 
@@ -9,7 +9,7 @@ module.exports = function (app) {
   plugin.name = 'SignalK AWS IoT';
   plugin.description = 'Plugin that sends data to AWS IoT Core';
 
-  plugin.start = function (options, restartPlugin) {
+  plugin.start = (options) => {
     // Here we put our plugin logic
     app.debug('Plugin started');
 
@@ -21,60 +21,47 @@ module.exports = function (app) {
       caCert: Buffer.from(options.aws_ca, 'utf8'),
     });
 
-    let localSubscription = {
+    const localSubscription = {
       context: '*', // Get data for all contexts
       subscribe: [{
         path: '*', // Get all paths
-        period: 5000 // Every 5000ms
-      }]
+        period: 5000, // Every 5000ms
+      }],
     };
 
     app.subscriptionmanager.subscribe(
       localSubscription,
       unsubscribes,
-      subscriptionError => {
-        app.error('Error:' + subscriptionError);
+      (subscriptionError) => {
+        app.error(subscriptionError);
       },
-      delta => {
-        delta.updates.forEach(u => {
-          u.values.forEach(v => {
-            app.debug(`PUB ${v.path.replace(/\./g, '/',)} ${JSON.stringify(v.value)}`);
-            device.publish(v.path.replace(/\./g, '/',), JSON.stringify(v.value));
+      (delta) => {
+        delta.updates.forEach((u) => {
+          u.values.forEach((v) => {
+            app.debug(`PUB ${v.path.replace(/\./g, '/')} ${JSON.stringify(v.value)}`);
+            device.publish(v.path.replace(/\./g, '/'), JSON.stringify(v.value));
           });
         });
-      }
-    )
+      },
+    );
 
     device
-      .on('connect', function() {
-        app.debug('connect');
+      .on('connect', () => {
+        app.debug('Connected to AWS IoT Core');
       });
     device
-      .on('message', function(topic, payload) {
-        app.debug('message', topic, payload.toString());
-      });
-
-    device
-      .on('reconnect', function() {
-        app.debug('reconnect');
+      .on('offline', () => {
+        app.debug('Offline');
       });
     device
-      .on('offline', function() {
-        app.debug('offline');
-      });
-    device
-      .on('error', function(error) {
-        app.debug('error', error);
-      });
-    device
-      .on('close', function() {
-        app.debug('close');
+      .on('error', (error) => {
+        app.error(error);
       });
   };
 
-  plugin.stop = function () {
-    unsubscribes.forEach(f => f());
-      unsubscribes = [];
+  plugin.stop = () => {
+    unsubscribes.forEach((f) => f());
+    unsubscribes = [];
     if (device) {
       device.end(true);
     }
@@ -127,8 +114,8 @@ o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
 5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy
 rqXRfboQnoZsG4q5WTP468SQvvG5
 -----END CERTIFICATE-----`,
-      }
-    }
+      },
+    },
   };
   plugin.uiSchema = {
     aws_key: {
@@ -140,7 +127,7 @@ rqXRfboQnoZsG4q5WTP468SQvvG5
     aws_ca: {
       'ui:widget': 'textarea',
     },
-  }
+  };
 
   return plugin;
 };
