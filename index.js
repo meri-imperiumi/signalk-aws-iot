@@ -9,6 +9,12 @@ module.exports = (app) => {
   plugin.name = 'SignalK AWS IoT';
   plugin.description = 'Plugin that sends data to AWS IoT Core';
 
+  function sendValue(v) {
+    const topic = v.path.replace(/\./g, '/');
+    app.debug(`PUB ${topic} ${JSON.stringify(v.value)}`);
+    device.publish(topic, JSON.stringify(v.value));
+  }
+
   plugin.start = (options) => {
     // Here we put our plugin logic
     app.debug('Plugin started');
@@ -21,11 +27,12 @@ module.exports = (app) => {
       caCert: Buffer.from(options.aws_ca, 'utf8'),
     });
 
+    const sendInterval = options.send_interval ? parseInt(options.send_interval, 10) : 10;
     const localSubscription = {
-      context: '*', // Get data for all contexts
+      context: 'vessels.self',
       subscribe: [{
-        path: '*', // Get all paths
-        period: 5000, // Every 5000ms
+        path: '*',
+        period: sendInterval * 1000,
       }],
     };
 
@@ -37,10 +44,7 @@ module.exports = (app) => {
       },
       (delta) => {
         delta.updates.forEach((u) => {
-          u.values.forEach((v) => {
-            app.debug(`PUB ${v.path.replace(/\./g, '/')} ${JSON.stringify(v.value)}`);
-            device.publish(v.path.replace(/\./g, '/'), JSON.stringify(v.value));
-          });
+          u.values.forEach(sendValue);
         });
       },
     );
@@ -114,6 +118,11 @@ o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
 5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy
 rqXRfboQnoZsG4q5WTP468SQvvG5
 -----END CERTIFICATE-----`,
+      },
+      send_inteval: {
+        type: 'number',
+        title: 'How often to send data, in seconds',
+        default: 10,
       },
     },
   };
