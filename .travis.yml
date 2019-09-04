@@ -1,3 +1,11 @@
 language: node_js
 node_js:
-  - lts/*
+- lts/*
+deploy:
+  provider: npm
+  email: henri.bergius@iki.fi
+  api_key:
+    secure: jH+j0DtfEDoUpxUnu1WWf3ogYaX0jLoMuJEoqwPmgli3rpeBxWjKjlZrvJi/rxH0R3AT6miJvZJ2jLL3DfHppiYT7RsKP5xTcDp1oL+6mE/nf3apbDIbEZ6S/W1cP5Cs0jQtU9xcQDrxbOn7Ar6MGgMl4zkrd/2LohkuXE90C05LiSF3F1TvyA4vgO+8UpOpwduKSJHqth4FS96zQeKk3N5HWfdpd2bBJ9LTaWvCed6X+NcegxIh8rE9bLXETNKmd+P1MOqs4/ys+JOghLe4zKdHKhLuF7wCkt8J9+L5P/3bIB7uEkOFTf4SvLI3hQLrsPBeQykGdGRyO6BvejWra3N1M2zuofwORrZBbPgdaka8/f5BTraevBKPDAQqlM/gBKIODKww0al/qGgH5TW5vEAaY8YtZadsuTFAC7iZ+hCIm+0R7fAxZ8cKbzzo5uQC/oMpczUAYzhUS3Bn9EfSlGFrzVZM4JUmNcf0Is0fzOVf9jznHOc8oMH+y2mHrHsDhubmAYZHIaRVsXQNgkn9JRf6jZwNV/XqfhjHLZh/odx4o3qNJw2WNiFg1pueq67FqSwHRhhtza8n8GERKv/BDa0mRZ355+1STLabKHakyFmUnoy5Vv61qNJOLoraha8p1MZWHMYYGQNR+KgtBS5awbAO3nLgeQzd53ZG/0uofTg=
+  on:
+    tags: true
+    repo: meri-imperiumi/signalk-aws-iot
