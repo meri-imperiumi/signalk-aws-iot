@@ -32,7 +32,7 @@ module.exports = (app) => {
       context: 'vessels.self',
       subscribe: [{
         path: '*',
-        period: options.send_interval * 1000,
+        period: (options.send_interval || 10) * 1000,
       }],
     };
 
