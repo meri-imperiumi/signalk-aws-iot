@@ -85,6 +85,9 @@ module.exports = (app) => {
     type: 'object',
     required: [
       'aws_host',
+      'aws_client_id',
+      'aws_key',
+      'aws_cert',
     ],
     properties: {
       aws_host: {
@@ -94,7 +97,7 @@ module.exports = (app) => {
       },
       aws_client_id: {
         type: 'string',
-        title: 'AWS IoT client ID',
+        title: 'AWS IoT client ID (must match Thing name)',
       },
       aws_key: {
         type: 'string',
