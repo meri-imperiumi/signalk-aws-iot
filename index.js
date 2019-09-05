@@ -27,12 +27,11 @@ module.exports = (app) => {
       caCert: Buffer.from(options.aws_ca, 'utf8'),
     });
 
-    const sendInterval = options.send_interval ? parseInt(options.send_interval, 10) : 10;
     const localSubscription = {
       context: 'vessels.self',
       subscribe: [{
         path: '*',
-        period: sendInterval * 1000,
+        period: options.send_interval * 1000,
       }],
     };
 
@@ -119,7 +118,7 @@ o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
 rqXRfboQnoZsG4q5WTP468SQvvG5
 -----END CERTIFICATE-----`,
       },
-      send_inteval: {
+      send_interval: {
         type: 'number',
         title: 'How often to send data, in seconds',
         default: 10,
