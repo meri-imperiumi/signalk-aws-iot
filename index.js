@@ -18,6 +18,7 @@ module.exports = (app) => {
   plugin.start = (options) => {
     // Here we put our plugin logic
     app.debug('Plugin started');
+    app.setProviderStatus('Initializing');
 
     device = awsIot.device({
       host: options.aws_host,
@@ -50,15 +51,24 @@ module.exports = (app) => {
 
     device
       .on('connect', () => {
-        app.debug('Connected to AWS IoT Core');
+        app.setProviderStatus('Connected to AWS IoT Core');
+      });
+    device
+      .on('reconnect', () => {
+        app.setProviderStatus('Reconnecting to AWS IoT Core');
       });
     device
       .on('offline', () => {
-        app.debug('Offline');
+        app.setProviderStatus('Offline');
+      });
+    device
+      .on('close', () => {
+        app.setProviderStatus('Connection closed');
       });
     device
       .on('error', (error) => {
         app.error(error);
+        app.setProviderError(error.message);
       });
   };
 
