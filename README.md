@@ -10,3 +10,11 @@ Plugin that sends a vessel's Signal K data stream to [AWS Iot Core](https://aws.
 3. Create a certificate for the Thing, and copy-paste it and your endpoint details to the plugin settings
 4. Ensure the device has an AWS policy allowing it to `iot:Connect` and `iot:Publish`
 5. Process or store the data stream from the device in the AWS solution of your choice
+
+If you're only interested in data from particular vessel states (for examples, when vessel is sailing), you can [install a plugin](https://www.npmjs.com/package/@meri-imperiumi/signalk-autostate) that automatically updates vessel state based on telemetry. Then you can choose the states in the configuration of this plugin.
+
+## Changes
+
+* 1.1.0 (git master)
+  - Option for sending all values to a single `signalk` AWS IoT topic instead of topic per Signal K path
+  - Ability to control in which vessel navigation states we send data to AWS IoT

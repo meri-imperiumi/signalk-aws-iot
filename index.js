@@ -4,12 +4,46 @@ module.exports = (app) => {
   const plugin = {};
   let device;
   let unsubscribes = [];
+  let state = 'default';
+  let connected = false;
 
   plugin.id = 'signalk-aws-iot';
   plugin.name = 'SignalK AWS IoT';
   plugin.description = 'Plugin that sends data to AWS IoT Core';
 
+  function isPublishState(options) {
+    const sendStates = options.send_states || [];
+    if (sendStates.indexOf(state) === -1) {
+      return false;
+    }
+    return true;
+  }
+
+  function setState(newState, options) {
+    if (newState === state) {
+      return;
+    }
+    state = newState;
+    if (!connected) {
+      // Since we're offline we get better provider state messages
+      // via connection handling
+      return;
+    }
+    if (isPublishState(options)) {
+      app.setProviderStatus('Connected to AWS IoT Core and sending data');
+    } else {
+      app.setProviderStatus(`Connected to AWS IoT Core. Not sending data due to "${state}" state`);
+    }
+  }
+
   function sendValue(v, options) {
+    if (v.path === 'navigation.state') {
+      setState(v.value, options);
+    }
+    if (!isPublishState(options)) {
+      // Not in a state where we want to send stuff
+      return;
+    }
     const topic = options.single_topic ? 'signalk' : v.path.replace(/\./g, '/');
     app.debug(`PUB ${topic} ${JSON.stringify(v.value)}`);
     device.publish(topic, JSON.stringify(v.value));
@@ -52,6 +86,7 @@ module.exports = (app) => {
     device
       .on('connect', () => {
         app.setProviderStatus('Connected to AWS IoT Core');
+        connected = true;
       });
     device
       .on('reconnect', () => {
@@ -60,10 +95,12 @@ module.exports = (app) => {
     device
       .on('offline', () => {
         app.setProviderStatus('Offline');
+        connected = false;
       });
     device
       .on('close', () => {
         app.setProviderStatus('Connection closed');
+        connected = false;
       });
     device
       .on('error', (error) => {
@@ -131,15 +168,54 @@ o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
 rqXRfboQnoZsG4q5WTP468SQvvG5
 -----END CERTIFICATE-----`,
       },
-      single_topic: {
-        type: 'boolean',
-        title: 'Publish all paths to a single topic',
-        default: false,
+      send_states: {
+        type: 'array',
+        title: 'Send data to AWS IoT when vessel is in the following states',
+        items: {
+          type: 'string',
+          enum: [
+            'default',
+            'not under command',
+            'anchored',
+            'moored',
+            'sailing',
+            'motoring',
+            'towing < 200m',
+            'towing > 200m',
+            'pushing',
+            'fishing',
+            'fishing-hampered',
+            'trawling',
+            'trawling-shooting',
+            'trawling-hauling',
+            'pilotage',
+            'not-under-way',
+            'aground',
+            'restricted manouverability',
+            'restricted manouverability towing < 200m',
+            'restricted manouverability towing > 200m',
+            'restricted manouverability underwater operations',
+            'constrained by draft',
+            'mine clearance',
+          ],
+        },
+        default: [
+          'default',
+          'sailing',
+          'motoring',
+          'anchored',
+        ],
+        uniqueItems: true,
       },
       send_interval: {
         type: 'number',
         title: 'How often to send data, in seconds',
         default: 10,
+      },
+      single_topic: {
+        type: 'boolean',
+        title: 'Publish all paths to a single topic',
+        default: false,
       },
     },
   };
@@ -152,6 +228,9 @@ rqXRfboQnoZsG4q5WTP468SQvvG5
     },
     aws_ca: {
       'ui:widget': 'textarea',
+    },
+    send_states: {
+      'ui:widget': 'checkboxes',
     },
   };
 
