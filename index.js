@@ -12,7 +12,8 @@ module.exports = (app) => {
   plugin.description = 'Plugin that sends data to AWS IoT Core';
 
   function isPublishState(options) {
-    if (options.send_states.indexOf(state) === -1) {
+    const sendStates = options.send_states || [];
+    if (sendStates.indexOf(state) === -1) {
       return false;
     }
     return true;
