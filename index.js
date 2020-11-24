@@ -78,7 +78,7 @@ module.exports = (app) => {
       },
       (delta) => {
         delta.updates.forEach((u) => {
-          u.values.forEach(sendValue, options);
+          u.values.forEach((v) => sendValue(v, options));
         });
       },
     );
