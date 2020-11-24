@@ -2,16 +2,16 @@ const chai = require('chai');
 const plugin = require('../index');
 
 describe('Signal K AWS IoT plugin', () => {
-  let status = null;
-  let error = null;
+  let providerStatus = null;
+  let providerError = null;
   const appMock = {
     debug: (msg) => console.log('DEBUG', msg),
     error: (err) => console.log('ERROR', err),
     setProviderError: (err) => {
-      error = err;
+      providerError = err;
     },
     setProviderStatus: (stat) => {
-      status = stat;
+      providerStatus = stat;
     },
     subscriptionmanager: {
       subscribe: () => {},
@@ -125,9 +125,9 @@ qk3zOcBzNkcGtiBhYLq2FwGmhJb8yiGRaD8tOg==
 -----END CERTIFICATE-----`;
       instance.start(options);
     });
-    it('should have set status', () => {
-      chai.expect(status).to.equal('Initializing');
-      chai.expect(error).to.be.a('null');
+    it('should have set providerStatus', () => {
+      chai.expect(providerStatus).to.equal('Initializing');
+      chai.expect(providerError).to.be.a('null');
     });
   });
   describe('on stop', () => {
