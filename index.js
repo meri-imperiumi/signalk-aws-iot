@@ -57,9 +57,9 @@ module.exports = (app) => {
     device = awsIot.device({
       host: options.aws_host,
       clientId: options.aws_client_id,
-      privateKey: Buffer.from(options.aws_key, 'utf8'),
-      clientCert: Buffer.from(options.aws_cert, 'utf8'),
-      caCert: Buffer.from(options.aws_ca, 'utf8'),
+      privateKey: Buffer.from(options.aws_key || '', 'utf8'),
+      clientCert: Buffer.from(options.aws_cert || '', 'utf8'),
+      caCert: Buffer.from(options.aws_ca || '', 'utf8'),
     });
 
     const localSubscription = {
