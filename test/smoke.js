@@ -2,19 +2,23 @@ const chai = require('chai');
 const plugin = require('../index');
 
 describe('Signal K AWS IoT plugin', () => {
-  let status = null;
-  let error = null;
+  let providerStatus = null;
+  let providerError = null;
+  let publishCallback = null;
+  const providerDebug = [];
   const appMock = {
-    debug: (msg) => console.log('DEBUG', msg),
+    debug: (msg) => providerDebug.push(msg),
     error: (err) => console.log('ERROR', err),
     setProviderError: (err) => {
-      error = err;
+      providerError = err;
     },
     setProviderStatus: (stat) => {
-      status = stat;
+      providerStatus = stat;
     },
     subscriptionmanager: {
-      subscribe: () => {},
+      subscribe: (sub, unsub, errCb, pub) => {
+        publishCallback = pub;
+      },
     },
   };
   const options = {};
@@ -125,9 +129,53 @@ qk3zOcBzNkcGtiBhYLq2FwGmhJb8yiGRaD8tOg==
 -----END CERTIFICATE-----`;
       instance.start(options);
     });
-    it('should have set status', () => {
-      chai.expect(status).to.equal('Initializing');
-      chai.expect(error).to.be.a('null');
+    it('should have set providerStatus', () => {
+      chai.expect(providerStatus).to.equal('Initializing');
+      chai.expect(providerError).to.be.a('null');
+    });
+    it('should have subscribed', () => {
+      chai.expect(publishCallback).to.be.a('function');
+    });
+  });
+  describe('on receiving deltas', () => {
+    function sendValue(path, value) {
+      publishCallback({
+        updates: [
+          {
+            values: [
+              {
+                path,
+                value,
+              },
+            ],
+          },
+        ],
+      });
+    }
+    it('should publish when receiving a delta in default state', () => {
+      sendValue('navigation.speedOverGround', 3.2);
+      const [lastMsg] = providerDebug.slice(-1);
+      chai.expect(lastMsg).to.include('PUB navigation/speedOverGround');
+    });
+    it('should update state when receiving one', () => {
+      sendValue('navigation.state', 'mine clearance');
+      const [lastMsg] = providerDebug.slice(-1);
+      chai.expect(lastMsg).to.include('PUB navigation/state');
+    });
+    it('should NOT publish when receiving a delta in non-sending state', () => {
+      sendValue('navigation.speedOverGround', 3.2);
+      const [lastMsg] = providerDebug.slice(-1);
+      chai.expect(lastMsg).to.not.include('PUB navigation/speedOverGround');
+    });
+    it('should update state when receiving one', () => {
+      sendValue('navigation.state', 'sailing');
+      const [lastMsg] = providerDebug.slice(-1);
+      chai.expect(lastMsg).to.include('PUB navigation/state');
+    });
+    it('should publish when receiving a delta in sending state', () => {
+      sendValue('navigation.speedOverGround', 3.2);
+      const [lastMsg] = providerDebug.slice(-1);
+      chai.expect(lastMsg).to.include('PUB navigation/speedOverGround');
     });
   });
   describe('on stop', () => {
