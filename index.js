@@ -39,8 +39,7 @@ module.exports = (app) => {
   function sendValue(v, options) {
     if (v.path === 'navigation.state') {
       setState(v.value, options);
-    }
-    if (!isPublishState(options)) {
+    } else if (!isPublishState(options)) {
       // Not in a state where we want to send stuff
       return;
     }
