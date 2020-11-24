@@ -15,6 +15,8 @@ If you're only interested in data from particular vessel states (for examples, w
 
 ## Changes
 
+* 1.1.1 (2020-11-24)
+  - Fixed an issue with `navigation.state` filtering when sending messages
 * 1.1.0 (2020-10-13)
   - Option for sending all values to a single `signalk` AWS IoT topic instead of topic per Signal K path
   - Ability to control in which vessel navigation states we send data to AWS IoT
