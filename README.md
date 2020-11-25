@@ -15,6 +15,8 @@ If you're only interested in data from particular vessel states (for examples, w
 
 ## Changes
 
+* 1.1.2 (2020-11-25)
+  - Compatibility with the upcoming "meta deltas" feature in Signal K
 * 1.1.1 (2020-11-24)
   - Fixed an issue with `navigation.state` filtering when sending messages
 * 1.1.0 (2020-10-13)
