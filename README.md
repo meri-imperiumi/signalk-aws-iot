@@ -15,6 +15,8 @@ If you're only interested in data from particular vessel states (for examples, w
 
 ## Changes
 
+* 1.1.3 (2020-11-30)
+  - Compatibility with the new `setPluginStatus`/`setPluginError` APIs in Signal K
 * 1.1.2 (2020-11-25)
   - Compatibility with the upcoming "meta deltas" feature in Signal K
 * 1.1.1 (2020-11-24)

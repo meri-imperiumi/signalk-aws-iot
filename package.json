@@ -1,6 +1,6 @@
 {
   "name": "@meri-imperiumi/signalk-aws-iot",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Plugin that sends metrics to AWS IoT",
   "main": "index.js",
   "scripts": {
