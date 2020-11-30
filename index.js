@@ -6,6 +6,8 @@ module.exports = (app) => {
   let unsubscribes = [];
   let state = 'default';
   let connected = false;
+  const setStatus = app.setPluginStatus || app.setProviderStatus;
+  const setError = app.setPluginError || app.setProviderError;
 
   plugin.id = 'signalk-aws-iot';
   plugin.name = 'SignalK AWS IoT';
@@ -30,9 +32,9 @@ module.exports = (app) => {
       return;
     }
     if (isPublishState(options)) {
-      app.setProviderStatus('Connected to AWS IoT Core and sending data');
+      setStatus('Connected to AWS IoT Core and sending data');
     } else {
-      app.setProviderStatus(`Connected to AWS IoT Core. Not sending data due to "${state}" state`);
+      setStatus(`Connected to AWS IoT Core. Not sending data due to "${state}" state`);
     }
   }
 
@@ -51,7 +53,7 @@ module.exports = (app) => {
   plugin.start = (options) => {
     // Here we put our plugin logic
     app.debug('Plugin started');
-    app.setProviderStatus('Initializing');
+    setStatus('Initializing');
 
     device = awsIot.device({
       host: options.aws_host,
@@ -90,27 +92,27 @@ module.exports = (app) => {
 
     device
       .on('connect', () => {
-        app.setProviderStatus('Connected to AWS IoT Core');
+        setStatus('Connected to AWS IoT Core');
         connected = true;
       });
     device
       .on('reconnect', () => {
-        app.setProviderStatus('Reconnecting to AWS IoT Core');
+        setStatus('Reconnecting to AWS IoT Core');
       });
     device
       .on('offline', () => {
-        app.setProviderStatus('Offline');
+        setStatus('Offline');
         connected = false;
       });
     device
       .on('close', () => {
-        app.setProviderStatus('Connection closed');
+        setStatus('Connection closed');
         connected = false;
       });
     device
       .on('error', (error) => {
         app.error(error);
-        app.setProviderError(error.message);
+        setError(error.message);
       });
   };
 
