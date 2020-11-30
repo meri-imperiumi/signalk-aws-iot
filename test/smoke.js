@@ -9,10 +9,10 @@ describe('Signal K AWS IoT plugin', () => {
   const appMock = {
     debug: (msg) => providerDebug.push(msg),
     error: (err) => console.log('ERROR', err),
-    setProviderError: (err) => {
+    setPluginError: (err) => {
       providerError = err;
     },
-    setProviderStatus: (stat) => {
+    setPluginStatus: (stat) => {
       providerStatus = stat;
     },
     subscriptionmanager: {
